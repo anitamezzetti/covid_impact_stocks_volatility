@@ -83,12 +83,14 @@ def grangers_causality_matrix(data, variables, test = 'ssr_chi2test', verbose=Fa
     # approximation 3 decimals
     dataset = dataset.round(decimals=3)
 
+    # ignore really low values:
+    dataset[dataset < 0.1] = 0
+
     return dataset
 
 
 
 # function which create sthe network and plots it
-
 def network_granger(granger_matrix, countries_of_interest):
 
     a = granger_matrix.to_numpy() #adjuant matrix
@@ -119,10 +121,13 @@ def network_granger(granger_matrix, countries_of_interest):
         name = country + '_x'
         country_importance.append(granger_matrix[name].sum())
 
-    plt.figure(figsize=(7,5))
+    if len(nodelist)<6:
+        plt.figure(figsize=(7,5))
+    else:
+        plt.figure(figsize=(12,10))
 
     nx.draw(G, pos=pos, node_color=country_importance, cmap=cmap, edge_color='white')
-    nx.draw_networkx_edges(G, pos=pos, arrowsize=20)
+    nx.draw_networkx_edges(G, pos=pos, arrowsize=10)
     for p in pos:  # raise text positions
         pos[p][0] += 0.15
 
@@ -165,7 +170,7 @@ def granger_causality(df, countries_of_interest, name):
     for country in df_confirmed_stat:
         stat_country = dickey_fuller_test(df_confirmed_stat[country], country, verbose=False)
         stationary_test[country] = stat_country
-        print('\n')
+        #print('\n')
 
     # print stationary series
     if len(countries_of_interest)<5: 
