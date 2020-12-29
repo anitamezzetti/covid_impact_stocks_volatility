@@ -4,9 +4,52 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import statsmodels.api as sm
 import networkx as nx
+from sklearn import preprocessing
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.stattools import grangercausalitytests
-import ipynb 
+
+# normalize data
+def scale_data(df, countries_of_interest):
+  min_max_scaler = preprocessing.MinMaxScaler()
+  x_scaled = min_max_scaler.fit_transform(df.values)
+  df_scaled = pd.DataFrame(x_scaled)
+
+  map = {}
+  for i in range(len(countries_of_interest)):
+      map[i] = countries_of_interest[i]
+
+  df_scaled = df_scaled.rename(columns=map)
+  df_scaled['Date'] = df.index
+  df_scaled = df_scaled.set_index('Date')
+  
+  return df_scaled
+
+
+# function which plots the time series in the dataframe
+def plot_time_series(df, title):
+    if len(df.columns)<7: 
+        figsize=(13,8)
+    else:
+        figsize=(13,18)
+
+    df.plot(subplots=True, title=title, figsize=figsize)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_correlation_matrix(df, countries_of_interest, title):
+    if len(countries_of_interest)<5: 
+        figsize=(8,6)
+    else:
+        figsize=(13,10)
+
+    corr = df.corr()
+    plt.figure(figsize=figsize)    
+    sns.heatmap(corr, xticklabels=corr.columns.values, yticklabels=corr.columns.values, annot = True)
+    plt.title(title)
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
+    plt.show()
 
 
 # Perform DF test for Stationarity 
@@ -58,6 +101,7 @@ def make_stationary(df_confirmed_scaled, stationary_test):
     return df_confirmed_stat
 
 
+# find granger causality matrix
 def grangers_causality_matrix(data, variables, test = 'ssr_chi2test', verbose=False):
 
     maxlag=12
@@ -121,28 +165,32 @@ def network_granger(granger_matrix, countries_of_interest):
         name = country + '_x'
         country_importance.append(granger_matrix[name].sum())
 
-    if len(nodelist)<6:
+
+    if len(nodelist)<8:
         plt.figure(figsize=(7,5))
+        nx.draw(G, pos=pos, node_color=country_importance, cmap=cmap, edge_color='white')
+        nx.draw_networkx_edges(G, pos=pos, arrowsize=10)
+        nx.draw_networkx_labels(G, pos=pos, labels=labels)
+
     else:
         plt.figure(figsize=(12,10))
+        nx.draw(G, pos=pos, node_color=country_importance, cmap=cmap, edge_color='white')
+        nx.draw_networkx_edges(G, pos=pos, arrowsize=10)
 
-    nx.draw(G, pos=pos, node_color=country_importance, cmap=cmap, edge_color='white')
-    nx.draw_networkx_edges(G, pos=pos, arrowsize=10)
-    for p in pos:  # raise text positions
-        pos[p][0] += 0.15
+        # labels
+        angle = []
+        angle_dict = {}
+        n = len(countries_of_interest)
+        for i, node in zip(range(n),G.nodes):
+            theta = 2.0*np.pi*i/n
+            angle.append((np.cos(theta),np.sin(theta)))
+            angle_dict[node] = theta
 
-    # labels
-    angle = []
-    angle_dict = {}
-    n = len(countries_of_interest)
-    for i, node in zip(range(n),G.nodes):
-        theta = 2.0*np.pi*i/n
-        angle.append((np.cos(theta),np.sin(theta)))
-        angle_dict[node] = theta
-    pos = {}
-    for node_i, node in enumerate(G.nodes):
-        pos[node] = angle[node_i]
-    nx.draw_networkx_labels(G, pos, labels=labels)
+        pos = {}
+        for node_i, node in enumerate(G.nodes):
+            pos[node] = angle[node_i]
+
+        nx.draw_networkx_labels(G, pos, labels=labels)
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin = min(country_importance), vmax=max(country_importance)))
     sm._A = []
@@ -151,7 +199,7 @@ def network_granger(granger_matrix, countries_of_interest):
     plt.show()
 
 
-
+# general function to be called to perform the granger causality study
 def granger_causality(df, countries_of_interest, name):
     # check stationary:
     print("STATIONARY TEST: \n")
@@ -193,3 +241,4 @@ def granger_causality(df, countries_of_interest, name):
 
     return granger_matrix
     
+
