@@ -10,19 +10,9 @@ from statsmodels.tsa.stattools import grangercausalitytests
 
 # normalize data
 def scale_data(df, countries_of_interest):
-  min_max_scaler = preprocessing.MinMaxScaler()
-  x_scaled = min_max_scaler.fit_transform(df.values)
-  df_scaled = pd.DataFrame(x_scaled)
-
-  map = {}
-  for i in range(len(countries_of_interest)):
-      map[i] = countries_of_interest[i]
-
-  df_scaled = df_scaled.rename(columns=map)
-  df_scaled['Date'] = df.index
-  df_scaled = df_scaled.set_index('Date')
-  
-  return df_scaled
+    max_df = max(df.max())
+    df_scaled = df/max_df
+    return df_scaled
 
 
 # function which plots the time series in the dataframe
@@ -133,7 +123,6 @@ def grangers_causality_matrix(data, variables, test = 'ssr_chi2test', verbose=Fa
     return dataset
 
 
-
 # function which create sthe network and plots it
 def network_granger(granger_matrix, countries_of_interest):
 
@@ -165,13 +154,15 @@ def network_granger(granger_matrix, countries_of_interest):
         name = country + '_x'
         country_importance.append(granger_matrix[name].sum())
 
+    labels_to_plot = {k:v for k,v in labels.items() if k in pos.keys()}
 
     if len(nodelist)<8:
         plt.figure(figsize=(7,5))
         nx.draw(G, pos=pos, node_color=country_importance, cmap=cmap, edge_color='white')
         nx.draw_networkx_edges(G, pos=pos, arrowsize=10)
-        nx.draw_networkx_labels(G, pos=pos, labels=labels)
 
+        nx.draw_networkx_labels(G, pos=pos, labels=labels_to_plot)
+        
     else:
         plt.figure(figsize=(12,10))
         nx.draw(G, pos=pos, node_color=country_importance, cmap=cmap, edge_color='white')
@@ -190,7 +181,7 @@ def network_granger(granger_matrix, countries_of_interest):
         for node_i, node in enumerate(G.nodes):
             pos[node] = angle[node_i]
 
-        nx.draw_networkx_labels(G, pos, labels=labels)
+        nx.draw_networkx_labels(G, pos, labels=labels_to_plot)
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin = min(country_importance), vmax=max(country_importance)))
     sm._A = []
