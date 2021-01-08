@@ -21,16 +21,6 @@ china_tickers = [
 # MPNGF, BEKE
 
 
-swiss_tickers = [
-    'JNJ', 'NESN', 'MC', 'RO', 'HD', 'OR', 'NOVN', 'PEP', 'ABT', 'LLY',
-    'RDSA', 'SAP', 'LIN', 'BMY.USD', 'AZN', 'PMI', 'SIN', 'FP', 'CAT', 
-    'ALV', 'MMM', 'GE', 'BNP', 'ZURN', 'ABBN', 'DPW', 'CS', 'BMW', 'UBSG',
-    'CFR', 'PHI', 'LONN', 'AAM', 'GLX', 'CSGN', 'ALCN', 'HPQ', 'PGHN', 
-    'SCHN', 'SCMN', 'CAP', 'UG', 'LISN', 'GEBN', 'SGSN', 'LISP', 'LOGN',
-    'SOON', 'SLHNE', 'CA', 'UHR', 'BARN', 'ADEN', 'TECN', 'SRCG'
-]
-
-
 japan_tickers = [
     'TM', '8058.T', 'HMC', '1JP.F', 'NPEXY', 'ITOCY', 'NSANY', 'SFTBY', 'HTHIY', 'JXHLY',
     'SNE','AONNY', 'PCRFY', 'MARUY', 'DCNSF', 'MITSY', 'SVNDY', 'TYHOF', 'MUFG', 'TOELY', 
@@ -39,6 +29,15 @@ japan_tickers = [
     'NHOLF', 'SSUMY', 'MZDAY', 'KAEPY', 'MAHLY', 'SMTOF', 'FUJHY', 'CHUEF', 'EJPRY', 'NEC1.F'
 ]    
 
+ 
+swiss_tickers = [
+    'JNJ', 'MC', 'HD', 'OR', 'NOVN', 'PEP', 'ABT', 'LLY', 'PM',
+    'SAP', 'LIN', 'AZN', 'SIN', 'CAT', 'RDSA.AS', 'BMY', 'FP.PA',
+    'ALV', 'MMM', 'GE', 'ABBN.SW', 'DPW', 'CS', 'BMW.MI', 'UBSG.SW', 'BNP.PA',
+    'CFR', 'PHI', 'LONN.SW', 'GLX.SW', 'CSGN.SW', 'ALCN', 'HPQ', 'PGHN.SW', 
+    'SCHN', 'SCMN.SW', 'CAP', 'UG', 'LISN.SW', 'GEBN.SW', 'SGSN.SW', 'LOGN',
+    'SOON.SW', 'SLHNE.SW', 'UHR.SW', 'BARN.SW', 'ADEN.SW', 'TECN.SW', 'SRCG.SW', 'ZURN.SW'
+]
 
 # important comapnies which are identified by a tocker which does not allow to understan
 # which company is are substituted with a understandable name for semplicity
@@ -47,6 +46,7 @@ ticker_id = {
     '300760.SZ': 'MINDRAY',
     '601888.SS': 'CTGDF',
     '603288.SS': 'FOSHAN',
-    '8058.T': 'MITSUB'
+    '8058.T': 'MITSUB',
+    'LISN.SW': 'LINDT'
 }
 

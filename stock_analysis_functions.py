@@ -179,7 +179,8 @@ def plot_price_rolling(date_index, data, day_rolling, tickers, country, title, y
 
 
 # function that given a time series retuns its return: r_t% = (X_t-X_t-1)/(X_t-1)*100
-def returns(names, data, data_index, percentage=True):
+# if all=True we change the name of the file to save because it includes all the stocks of that country (needed to build the portfolios)
+def returns(names, data, data_index, country, percentage=True, all=False):
 
     if len(names)==1: # only one time series
         # do not create a dataset but return directly a list
@@ -201,6 +202,11 @@ def returns(names, data, data_index, percentage=True):
     returns['Date'] = data_index.values
     returns = returns.set_index('Date')
     #returns = returns.drop(returns.index[0]) # drop first row which is NaN
+
+    if all==True:
+        returns.to_csv(f"datasets/{country}_returns_all.csv")
+    else:    
+        returns.to_csv(f"datasets/{country}_returns.csv")
 
     return returns
 
@@ -236,12 +242,13 @@ def get_sp500_stocks_data(index, start, end, read=False):
 
 # function that creates the SP500 index starting from the 500 prices
 def create_SP500_index(df_500_stocks):
+
     data_index = df_500_stocks.index
 
     df_index =  pd.DataFrame(index=data_index)
 
     df_index['adj_price'] = df_500_stocks.mean(axis=1)
-    df_index['return_per'] = returns(['adj_price'], df_index, data_index, percentage=True)
+    df_index['return_per'] = returns(['adj_price'], df_index, data_index, 'sp500', percentage=True)
 
     return df_index
 
