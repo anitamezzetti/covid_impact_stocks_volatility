@@ -16,11 +16,11 @@ def data_from_yahoo(tickers, ticker_id,  start, end, country, read=False):
 
     if read==True: # already created datasets
 
-        high = pd.read_csv(f'datasets_stocks/{country}_high.csv')
-        low = pd.read_csv(f'datasets_stocks/{country}_low.csv')
-        openn = pd.read_csv(f'datasets_stocks/{country}_open.csv')
-        close = pd.read_csv(f'datasets_stocks/{country}_close.csv')
-        adj_close = pd.read_csv(f'datasets_stocks/{country}_adj_close.csv')
+        high = pd.read_csv(f'datasets/{country}_high.csv')
+        low = pd.read_csv(f'datasets/{country}_low.csv')
+        openn = pd.read_csv(f'datasets/{country}_open.csv')
+        close = pd.read_csv(f'datasets/{country}_close.csv')
+        adj_close = pd.read_csv(f'datasets/{country}_adj_close.csv')
 
         datasets = {'high':high, 'low':low, 'open':openn, 'close':close, 'adj_close':adj_close}
         return datasets
@@ -50,11 +50,11 @@ def data_from_yahoo(tickers, ticker_id,  start, end, country, read=False):
 
 
     # save data
-    high.to_csv(f'datasets_stocks/{country}_high.csv')
-    low.to_csv(f'datasets_stocks/{country}_low.csv')
-    openn.to_csv(f'datasets_stocks/{country}_open.csv')
-    close.to_csv(f'datasets_stocks/{country}_close.csv')
-    adj_close.to_csv(f'datasets_stocks/{country}_adj_close.csv')
+    high.to_csv(f'datasets/{country}_high.csv')
+    low.to_csv(f'datasets/{country}_low.csv')
+    openn.to_csv(f'datasets/{country}_open.csv')
+    close.to_csv(f'datasets/{country}_close.csv')
+    adj_close.to_csv(f'datasets/{country}_adj_close.csv')
 
     datasets = {'high':high, 'low':low, 'open':openn, 'close':close, 'adj_close':adj_close}
     return datasets
@@ -114,7 +114,7 @@ def extract_max(data, n, Names=True):
 
 
 # function that plots time series prices
-def plot_price(date_index, data, tickers, title, yylabel='Price'):
+def plot_price(date_index, data, tickers, country, title, yylabel='Price'):
     
     months = pd.to_datetime(date_index).dt.month
     year = pd.to_datetime(date_index).dt.year
@@ -139,12 +139,13 @@ def plot_price(date_index, data, tickers, title, yylabel='Price'):
             plt.title(titlee)
             plt.ylabel(yylabel)
             plt.legend()
+            plt.savefig(f'plots_stocks/{country}_price_{name}.pdf')
             plt.show()
     return
 
 
 # function that plots time series prices with rolling
-def plot_price_rolling(date_index, data, day_rolling, tickers, title, yylabel='Price'):
+def plot_price_rolling(date_index, data, day_rolling, tickers, country, title, yylabel='Price'):
 
     months = pd.to_datetime(date_index).dt.month
     year = pd.to_datetime(date_index).dt.year
@@ -172,6 +173,7 @@ def plot_price_rolling(date_index, data, day_rolling, tickers, title, yylabel='P
             plt.title(titlee)
             plt.ylabel(yylabel)
             plt.legend()
+            plt.savefig(f'plots_stocks/{country}_price_roll_{yylabel}_{name}.pdf')
             plt.show()
     return
 
@@ -207,7 +209,7 @@ def returns(names, data, data_index, percentage=True):
 def get_sp500_stocks_data(index, start, end, read=False):
 
     if read == True:
-        data = pd.read_csv('datasets_stocks/sp500_stocks.csv')
+        data = pd.read_csv('datasets/sp500_stocks.csv')
         data = data.drop("Unnamed: 0", axis=1)
         return data
 
@@ -227,7 +229,7 @@ def get_sp500_stocks_data(index, start, end, read=False):
         data = None
 
     # save data
-    data.to_csv('datasets_stocks/sp500_stocks.csv')
+    data.to_csv('datasets/sp500_stocks.csv')
 
     return data
 
@@ -257,7 +259,7 @@ def create_merge_SP500_index(df_500_stocks, df_returns):
 
 
 # function that plots variance
-def plot_variance(names, data, title):
+def plot_variance(names, data, country, title):
 
     for name in names:
         df = pd.DataFrame()
@@ -268,6 +270,7 @@ def plot_variance(names, data, title):
         plt.xticks(rotation=90)
         titlee = 'Variance of ' + title + ' of ' +  name
         plt.title(titlee)
+        plt.savefig(f'plots_stocks/{country}_var_{title}_{name}.pdf')
         plt.show()
 
     return 
@@ -275,15 +278,18 @@ def plot_variance(names, data, title):
 
 # function that plots two rolling times series
 # different from plot_price_rolling because that plots the differenc between daily and rolling
-def plot_rolling_timeseries(date_index, names, df1, df2, day_rolling, title):
+def plot_rolling_timeseries(date_index, names, dfs, day_rolling, country, title):
 
     months = pd.to_datetime(date_index).dt.month
     year = pd.to_datetime(date_index).dt.year
     labels = (months.astype(str) + "-" + year.astype(str))
 
     # data rolled
-    df1_rolled = df1.rolling(day_rolling).mean().fillna(df1.mean())
-    df2_rolled = df2.rolling(day_rolling).mean().fillna(df1.mean())
+    dfs['open'] = dfs['open'].rolling(day_rolling).mean().fillna(dfs['open'].mean())
+    dfs['high'] = dfs['high'].rolling(day_rolling).mean().fillna(dfs['high'].mean())
+    dfs['low'] = dfs['low'].rolling(day_rolling).mean().fillna(dfs['low'].mean())
+    dfs['close'] = dfs['close'].rolling(day_rolling).mean().fillna(dfs['close'].mean())
+    
 
     for name in names:
         if name!='Date':
@@ -291,19 +297,64 @@ def plot_rolling_timeseries(date_index, names, df1, df2, day_rolling, title):
             # plot
             label_open = 'Open ' + str(day_rolling) + '-day rolling mean'
             label_close = 'Close ' + str(day_rolling) + '-day rolling mean'
+            label_low = 'Low ' + str(day_rolling) + '-day rolling mean'
+            label_high = 'high ' + str(day_rolling) + '-day rolling mean'
             
             fig, ax = plt.subplots()
-            ax.plot(pd.to_datetime(date_index), df1_rolled[name], label=label_open)
-            ax.plot(pd.to_datetime(date_index), df2_rolled[name], label=label_close)
+            ax.plot(pd.to_datetime(date_index), dfs['open'][name], label=label_open)
+            ax.plot(pd.to_datetime(date_index), dfs['close'][name], label=label_close)
+            ax.plot(pd.to_datetime(date_index), dfs['low'][name], label=label_low)
+            ax.plot(pd.to_datetime(date_index), dfs['high'][name], label=label_high)
             
             titlee = name + ' ' + title + ' with rolling window'
             ax.xaxis_date()     
             fig.autofmt_xdate() 
             plt.title(titlee)
             plt.legend()
+            plt.savefig(f'plots_stocks/{country}_rolling_timeseries_{name}.pdf')
             plt.show()
 
     return
 
 
+# function that plots two time series to compare some stocks and the sp500 index 
+def plot_sp500_comparison (df, names, country, title):
 
+    for name in names:
+        
+        y2 = df[name]
+        y1 = df['SP500']
+        
+        plt.plot(pd.to_datetime(df.index), y2, label=name, color='b', linewidth=1)
+        plt.plot(pd.to_datetime(df.index), y1, label='SP500', color='m', linewidth=1)
+        plt.legend()
+        titlee = 'Comparinson between ' + title + ' of ' + name + ' vs SP500'
+        plt.title(titlee)
+        plt.ylabel('Returns in %')
+        plt.savefig(f'plots_stocks/{country}_comparison_sp500_{name}.pdf')
+        plt.show()
+
+    return
+
+
+# function that plots two time series with rolling window to compare some stocks and the sp500 index 
+def plot_sp500_comparison_rolling (df, names, day_rolling, country, title):
+
+    for name in names:
+        
+        y2 = df[name].rolling(day_rolling).mean()
+        y1 = df['SP500'].rolling(day_rolling).mean()
+
+        label1 = name + ' ' + str(day_rolling) + '-day rolling mean'
+        label2 = 'SP500 ' + str(day_rolling) + '-day rolling mean'
+        
+        plt.plot(pd.to_datetime(df.index), y2, label=label1, color='b', linewidth=1)
+        plt.plot(pd.to_datetime(df.index), y1, label=label2, color='m', linewidth=1)
+        plt.legend()
+        titlee = 'Comparinson between ' + title + ' of ' + name + ' vs SP500'
+        plt.title(titlee)
+        plt.ylabel('Returns in %')
+        plt.savefig(f'plots_stocks/{country}_comparison_sp500_roll_{name}.pdf')
+        plt.show()
+
+    return
