@@ -199,7 +199,7 @@ def network_granger(granger_matrix, countries_of_interest, description):
 
 
 # General function to be called to perform the granger causality study. It uses the previous funtions
-def granger_causality(df, countries_of_interest, name, des, skip_stationarity=False):
+def granger_causality(df, countries_of_interest, name, des='', skip_stationarity=False):
     
 
     if skip_stationarity==False: # usually we check stationarity 
