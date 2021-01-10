@@ -8,15 +8,15 @@ from sklearn import preprocessing
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.stattools import grangercausalitytests
 
-# normalize data
+# function that normalizes data
 def scale_data(df, countries_of_interest):
     max_df = max(df.max())
     df_scaled = df/max_df
     return df_scaled
 
 
-# function which plots the time series in the dataframe
-def plot_time_series(df, title):
+# function that plots the time series in the dataframe
+def plot_time_series(df, title, description):
     if len(df.columns)<7: 
         figsize=(13,8)
     else:
@@ -24,10 +24,12 @@ def plot_time_series(df, title):
 
     df.plot(subplots=True, title=title, figsize=figsize)
     plt.tight_layout()
+    plt.savefig(f"plots_gc/time_series_{description}.pdf")
     plt.show()
 
 
-def plot_correlation_matrix(df, countries_of_interest, title):
+# function that plots the correlation matrix
+def plot_correlation_matrix(df, countries_of_interest, title, description):
     if len(countries_of_interest)<5: 
         figsize=(8,6)
     else:
@@ -39,11 +41,13 @@ def plot_correlation_matrix(df, countries_of_interest, title):
     plt.title(title)
     plt.xticks(fontsize=10)
     plt.yticks(fontsize=10)
+    plt.savefig(f"plots_gc/corr_matrix_{description}.pdf")
     plt.show()
 
 
-# Perform DF test for Stationarity 
-# return 0: stationary or 1: non-stationary
+# function that perform ADF test for Stationarity 
+# return 0: stationary 
+#        1: non-stationary
 def dickey_fuller_test(series, country='', verbose=True):
 
     signif=0.05
@@ -75,6 +79,7 @@ def dickey_fuller_test(series, country='', verbose=True):
             return 1 # Non-Stationary
 
 
+# function that makes time series stationary (differencing)
 def make_stationary(df_confirmed_scaled, stationary_test):
     # save stationary time series:
     df_confirmed_stat = pd.DataFrame(index=df_confirmed_scaled.index)
@@ -124,7 +129,10 @@ def grangers_causality_matrix(data, variables, test = 'ssr_chi2test', verbose=Fa
 
 
 # function which create sthe network and plots it
-def network_granger(granger_matrix, countries_of_interest):
+def network_granger(granger_matrix, countries_of_interest, description):
+
+    if granger_matrix.sum().sum()==0: # everything is zero
+        return 
 
     a = granger_matrix.to_numpy() #adjuant matrix
     G = nx.DiGraph()
@@ -160,7 +168,6 @@ def network_granger(granger_matrix, countries_of_interest):
         plt.figure(figsize=(7,5))
         nx.draw(G, pos=pos, node_color=country_importance, cmap=cmap, edge_color='white')
         nx.draw_networkx_edges(G, pos=pos, arrowsize=10)
-
         nx.draw_networkx_labels(G, pos=pos, labels=labels_to_plot)
         
     else:
@@ -187,21 +194,27 @@ def network_granger(granger_matrix, countries_of_interest):
     sm._A = []
     plt.title("Network representation of granger causality")
     plt.colorbar(sm)
+    plt.savefig(f"plots_gc/network_grander{description}.pdf")
     plt.show()
 
 
-# general function to be called to perform the granger causality study
-def granger_causality(df, countries_of_interest, name):
-    # check stationary:
-    print("STATIONARY TEST: \n")
-    stationary_test = {}
-    for country in df:
-        stat_country = dickey_fuller_test(df[country], country)
-        stationary_test[country] = stat_country
-        print('\n')
+# General function to be called to perform the granger causality study. It uses the previous funtions
+def granger_causality(df, countries_of_interest, name, des, skip_stationarity=False):
+    
 
-    # make them stationary:
-    df_confirmed_stat = make_stationary(df, stationary_test)
+    if skip_stationarity==False: # usually we check stationarity 
+        # check stationary:
+        print("STATIONARY TEST: \n")
+        stationary_test = {}
+        for country in df:
+            stat_country = dickey_fuller_test(df[country], country)
+            stationary_test[country] = stat_country
+            print('\n')
+
+        # make them stationary:
+        df_confirmed_stat = make_stationary(df, stationary_test)
+    else: # if we skip statonarity (usually not done)
+        df_confirmed_stat = df
 
     # recheck stationary:
     #print("STATIONARY TEST after we make series stationary: \n")
@@ -228,7 +241,7 @@ def granger_causality(df, countries_of_interest, name):
 
     # plot network
     print("\n\n")
-    network_granger(granger_matrix, countries_of_interest)
+    network_granger(granger_matrix, countries_of_interest, des)
 
     return granger_matrix
     
