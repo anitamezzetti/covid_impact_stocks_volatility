@@ -8,10 +8,22 @@ from sklearn import preprocessing
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.stattools import grangercausalitytests
 
-# function that normalizes data
-def scale_data(df, countries_of_interest):
-    max_df = max(df.max())
-    df_scaled = df/max_df
+# function that normalizes data 
+# if all=True we want to normalise considering as max the max of the whole dataset
+# if all=False we want to normlise each series of the DataSet indiendently
+# this difference is important because when we have data of different types (as COVID cases and returns) we cannot do
+# a generalised normalisation for different things. While when we analyse only COVID cases or only stocks, all=True
+def scale_data(df, countries_of_interest, all=True):
+    
+    if all==True:
+        max_df = max(df.max())
+        df_scaled = df/max_df
+    else: 
+        df_scaled = pd.DataFrame(index=df.index)
+        for column in df.columns:
+            max_column = max(df[column])
+            df_scaled[column] = df[column]/max_column
+    
     return df_scaled
 
 
