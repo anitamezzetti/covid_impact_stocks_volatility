@@ -208,3 +208,5 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/windows,linux,python,visualstudiocode,jupyternotebooks
 
 token.txt
+plots_gc
+plots_stocks
