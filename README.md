@@ -1,4 +1,4 @@
-# The Impact of COVID-19 on Returns and Volatility:a case study of the United States, China, Switzerland andJapan
+# The Impact of COVID-19 on Returns and Volatility:a case study of the United States, China, Switzerland and Japan
 
 
 Analysis of the relationship between stock prices and developments of COVID cases.
