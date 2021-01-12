@@ -145,7 +145,9 @@ def plot_price(date_index, data, tickers, country, title, yylabel='Price'):
 
 
 # function that plots time series prices with rolling
-def plot_price_rolling(date_index, data, day_rolling, tickers, country, title, yylabel='Price'):
+# it returns the rolled DataSet if return_rolled=True 
+def plot_price_rolling(date_index, data, day_rolling, tickers, country, title, yylabel='Price', return_rolled=False):
+
 
     months = pd.to_datetime(date_index).dt.month
     year = pd.to_datetime(date_index).dt.year
@@ -173,8 +175,13 @@ def plot_price_rolling(date_index, data, day_rolling, tickers, country, title, y
             plt.title(titlee)
             plt.ylabel(yylabel)
             plt.legend()
-            plt.savefig(f'plots_stocks/{country}_price_roll_{yylabel}_{name}.pdf')
+            #plt.savefig(f'plots_stocks/{country}_price_roll_{yylabel}_{name}.pdf')
             plt.show()
+    
+    
+    if return_rolled == True:
+        return data_rolled
+
     return
 
 
@@ -363,5 +370,23 @@ def plot_sp500_comparison_rolling (df, names, day_rolling, country, title):
         plt.ylabel('Returns in %')
         plt.savefig(f'plots_stocks/{country}_comparison_sp500_roll_{name}.pdf')
         plt.show()
+
+    return
+
+
+
+# function that plots returns in periods of lockdowns
+def plot_lockdown_return (df, country, period_lock):
+
+    select_rows_dataframe = (df.index >= period_lock[0]) & (df.index <= period_lock[1])
+    data = df[select_rows_dataframe]
+
+    fig, ax = plt.subplots(figsize=(8,5))
+    titlee = country + ' ' + 'returns %  (7 days rolling window)'
+    plt.title(titlee)
+    plt.ylabel('Return %')
+    data.plot(ax=ax)
+    plt.savefig(f'plots_stocks/returns_lockdowns_{country}.PNG')
+    plt.show()
 
     return
