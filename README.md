@@ -12,6 +12,7 @@ _Abstract_: The year 2020 observed a huge shock that affected every industry on 
 
 ### Code Structure:
 | File Name | Description |
+| --- | --- |
 | tickers.py | ticker lists of the stocks for each country |
 | stock_analysis_functions.py | Contains all the functions needed for the stock EDA and the portfolio construction |
 | StockPriceEDA.ipynb | Stocks analysis |
