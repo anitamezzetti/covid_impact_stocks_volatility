@@ -21,5 +21,6 @@ _Abstract_: The year 2020 observed a huge shock that affected every industry on 
 | GrangerCausalityCovid.ipynb  | G-causality between COVID-19 daily new cases in different countries  |
 | GrangerCausalityStocks.ipynb  | G-causality between stocks returns for each country  |
 | GrangerCausalityCovidPotfolios.ipynb  | G-causality between COVID-19 daily new cases amd portfolio returns|
-
-Hien...  
+| `CovidDataRetrieval.ipynb` | Retrieval of COVID-19's data on cases from Johns Hopkins (using proxy API) and univariate analysis of the evolution of cases|
+| `IntradayDataRetrieval.ipynb` | Retrieval of Intraday data from Dukascopy |
+| `RealisedVariance.ipynb` | Calculation of RVs by country using intraday data saved previously|
