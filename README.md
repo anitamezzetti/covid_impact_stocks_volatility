@@ -19,6 +19,6 @@ _Abstract_: The year 2020 observed a huge shock that affected every industry on 
 | granger_causality_functions.py  | Contains all the functions to compute the Granger causality test |
 | GrangerCausalityCovid.ipynb  | G-causality between COVID-19 daily new cases in different countries  |
 | GrangerCausalityStocks.ipynb  | G-causality between stocks returns for each country  |
-| GrangerCausalityCovidPotfolios.ipynb  | G-causality between COVID-19 daily new cases amd portfolio returns
+| GrangerCausalityCovidPotfolios.ipynb  | G-causality between COVID-19 daily new cases amd portfolio returns|
 
-Hien...  |
+Hien...  
