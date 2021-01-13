@@ -11,5 +11,7 @@ _Abstract_: The year 2020 observed a huge shock that affected every industry on 
 
 
 ### Code Structure:
-- 
-- 
+| File Name | Description |
+| --- | --- |
+| git status | List all new or modified files |
+| git diff | Show file differences that haven't been staged |
